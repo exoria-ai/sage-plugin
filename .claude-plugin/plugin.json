@@ -1,0 +1,14 @@
+{
+  "name": "sage",
+  "description": "SAGE - Solano Agent for Geographic Enquiry. AI-powered GIS assistant for Solano County, California providing property lookups, zoning queries, hazard assessments, budget analysis, and county code search.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Exoria AI"
+  },
+  "homepage": "https://github.com/exoria-ai/sage-plugin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/exoria-ai/sage-plugin.git"
+  },
+  "license": "MIT"
+}
