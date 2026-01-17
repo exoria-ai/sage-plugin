@@ -6,9 +6,6 @@
     "name": "Exoria AI"
   },
   "homepage": "https://github.com/exoria-ai/sage-plugin",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/exoria-ai/sage-plugin.git"
-  },
+  "repository": "https://github.com/exoria-ai/sage-plugin",
   "license": "MIT"
 }
