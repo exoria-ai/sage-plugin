@@ -311,3 +311,74 @@ Electorate
 ```
 
 *Note: Constitutional officers are elected independently and do not report to the County Administrator, though they coordinate with county leadership on budget and policy matters.*
+
+---
+
+## Using Staffing Tools
+
+The MCP server provides real-time access to the county's staffing data (as of April 2025).
+
+### Available Tools
+
+| Tool | Purpose | Example |
+|------|---------|---------|
+| `get_org_overview` | All departments with FTE counts | Starting point for org questions |
+| `get_department` | Department details with divisions | `get_department("Sheriff")` or `get_department("6550")` |
+| `get_division` | Specific division details | `get_division("7501")` |
+| `search_positions` | Find positions by title | `search_positions("analyst")` |
+| `get_position_distribution` | Where a job class is allocated | `get_position_distribution("Social Worker")` |
+| `list_job_classes` | Job classifications with grades | Browse all job classes |
+| `compare_departments` | Side-by-side comparison | `compare_departments(["Sheriff", "Probation"])` |
+
+### Department Codes
+
+| Code | Department | FTEs |
+|------|------------|------|
+| 7500 | Health & Social Services | 1,434 |
+| 6550 | Sheriff's Office | 588 |
+| 6650 | Probation | 226 |
+| 6500 | District Attorney | 141 |
+| 6300 | Library | 129 |
+| 1117 | General Services | 112 |
+| 6530 | Public Defender | 97 |
+| 1550 | DoIT/Registrar of Voters | 83 |
+| 2480 | Child Support Services | 73 |
+| 3010 | Resource Mgmt - Public Works | 73 |
+| 2910 | Resource Management | 68 |
+| 1150 | Assessor/Recorder | 62 |
+| 1200 | Auditor-Controller | 38 |
+| 1103 | HR-Employee Development | 37 |
+| 1100 | County Administrator's Office | 35 |
+| 2830 | Agriculture | 28 |
+| 1400 | County Counsel | 21 |
+| 1000 | Board of Supervisors | 15 |
+| 1300 | Treasurer/Tax Collector/Clerk | 15 |
+| 5800 | Veterans Services | 8 |
+| 1450 | Delta Water Activities | 2 |
+
+### Common Queries
+
+**"How many [position] does the county have?"**
+```
+search_positions("social worker")
+→ Returns all positions matching, with department/division breakdown
+```
+
+**"What's the structure of [department]?"**
+```
+get_department("H&SS", include_positions=true)
+→ Returns divisions, top positions, full position list
+```
+
+**"Compare staffing between departments"**
+```
+compare_departments(["Sheriff", "District Attorney", "Public Defender"])
+→ Side-by-side FTE, division, position comparison
+```
+
+### Data Notes
+
+- **FTEs** = Full-Time Equivalents (part-time positions counted fractionally)
+- **LT FTEs** = Limited-Term positions (temporary/grant-funded)
+- Data reflects authorized positions, not necessarily filled positions
+- Position counts are allocated positions, not individual employees
