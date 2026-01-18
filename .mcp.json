@@ -1,6 +1,7 @@
 {
   "mcpServers": {
     "sage": {
+      "type": "url",
       "url": "https://sage-three-theta.vercel.app/api/mcp"
     }
   }
