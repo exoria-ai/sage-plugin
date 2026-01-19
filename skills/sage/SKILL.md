@@ -57,6 +57,17 @@ You have access to these MCP tools organized by category:
 | `get_parcels_in_buffer` | Parcels within radius (for notification lists) |
 | `render_map` | Generate static map images |
 
+### GIS Layer Discovery Tools
+| Tool | Purpose |
+|------|---------|
+| `list_gis_categories` | Browse 11 layer categories with counts |
+| `list_gis_layers` | List layers by category or priority |
+| `search_gis_layers` | Keyword search across 67 layers |
+| `get_gis_layer_details` | Service URL, fields, geometry type |
+| `find_layers_for_question` | Match user questions to relevant layers |
+
+**Layer Categories:** property, zoning (16 layers), hazards (7), districts (6), services (3), poi (10), infrastructure (5), emergency (4), environmental (3), demographics (2), basemap (1)
+
 ### General Plan Tools (2008 General Plan + Updates)
 | Tool | Purpose |
 |------|---------|
@@ -136,6 +147,7 @@ When you need detailed information on these topics, read the corresponding refer
 - **Spatial orientation / "Where is X?"** → `references/spatial-grounding.md`
 - **Detailed county history/demographics** → `references/solano-county-encyclopedia.md`
 - **Jurisdiction routing** → `references/jurisdiction.md`
+- **GIS layers, querying, discovery** → `references/gis-layers.md`
 
 ### County Organization
 - **Departments, leadership, org chart** → `references/org-structure.md`
@@ -403,3 +415,5 @@ Shows all 7 cities within county boundaries.
 | "Who needs to be notified for my project?" | geocode → render_map (buffer) → get_parcels_in_buffer |
 | "Create a visual of X" | get_department/search_parcels → generate_infographic |
 | "Compare departments X and Y" | compare_departments → get_department_budget (for each) |
+| "What GIS layers exist for X?" | search_gis_layers OR find_layers_for_question → get_gis_layer_details |
+| "Show layer X on a map" | get_gis_layer_details → render_map (with additionalLayers) |

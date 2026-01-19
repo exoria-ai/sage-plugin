@@ -43,6 +43,13 @@ Once installed, you'll have access to these MCP tools:
 - `get_parcels_in_buffer` - Parcels within radius (notification lists)
 - `render_map` - Generate static map images
 
+### GIS Layer Discovery
+- `list_gis_categories` - Browse 11 layer categories
+- `list_gis_layers` - List layers by category or priority
+- `search_gis_layers` - Keyword search across 67 layers
+- `get_gis_layer_details` - Service URL, fields, metadata
+- `find_layers_for_question` - Match questions to relevant layers
+
 ### County Code
 - `get_county_code_sections` - Full text of code sections
 - `list_county_code_chapters` - Available chapters
@@ -73,6 +80,7 @@ After installing the plugin, ask Claude questions like:
 
 The plugin includes detailed reference materials on:
 
+- GIS layers, discovery, and querying
 - Jurisdiction routing (city vs county)
 - Zoning code interpretation
 - Proposition 13 / assessed values
