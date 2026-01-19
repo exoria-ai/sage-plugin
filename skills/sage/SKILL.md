@@ -301,7 +301,105 @@ When using `render_map`:
 - Use `apn` parameter for single parcel focus
 - Use `buffer` parameter for notification radius visualization
 - Use `extent: 'county'` with boundaries for overview maps
-- Default to `basemap: 'aerial'` for property context
+- Enable `layers: { aerial2025: true }` for 2025 high-res Solano County aerial imagery (clearer than default basemaps when zoomed in on parcels)
 - Always include the `imageUrl` in your response
 
 **For buffer/notification maps**: Use `render_map` with buffer parameter directly - it handles the spatial query internally. Only use `get_parcels_in_buffer` if you need owner names/addresses for notification lists.
+
+**Note**: If APN-based buffer fails, use coordinates instead: `buffer: { latitude: X, longitude: Y, radius_feet: 500 }`
+
+## Advanced Capabilities
+
+### 1. AI-Generated Infographics
+Use `generate_infographic` to create custom visuals on-the-fly:
+- Org charts showing department structures
+- Process flow diagrams for permit procedures
+- Comparison charts for zoning districts
+- Budget visualizations
+
+**Example prompt**: "Create an organizational chart for Solano County showing the top 5 largest departments by staffing with FTE counts in boxes"
+
+### 2. Workforce Analytics
+Powerful staffing analysis capabilities:
+
+**Position Distribution**: `get_position_distribution` shows where a job class is allocated county-wide
+```
+Example: "Social Worker" → 159 FTEs across:
+- H&SS Child Welfare: 87 FTEs
+- H&SS Older/Disabled Adult Services: 53 FTEs
+- Probation: 3 FTEs
+- Public Defender: 3 FTEs
+```
+
+**Department Comparison**: `compare_departments` for side-by-side analysis
+```
+Example: Compare Sheriff, Probation, Public Defender
+→ Shows FTEs, division counts, top 5 positions for each
+```
+
+### 3. Parcel Search with Aggregations
+`search_parcels` returns rich statistical data beyond samples:
+- **total_count**: Number of matching parcels
+- **total_acres / avg_acres**: Acreage statistics
+- **total_value / avg_value**: Assessment value statistics
+- **by_use**: Breakdown by property use type
+
+**Example queries**:
+- `{ "zoning": "A-40", "min_acres": 100 }` → 276 parcels, 49,337 total acres
+- `{ "city": "VALLEJO", "min_acres": 1, "max_acres": 10 }` → 806 parcels with use breakdown
+
+### 4. Full Legal Text Retrieval
+`get_county_code_sections` returns complete section text including:
+- Full regulatory language with subsections
+- Development standards tables
+- Permit requirements
+- Ordinance references
+
+**Key sections for common questions**:
+- ADU/JADU rules: `28.72.10` (Dwellings - very detailed)
+- Agritourism: `28.75.10` (full requirements)
+- Administrative permits: `28.101`
+- Use permits: `28.106`
+- Variances: `28.107`
+
+### 5. Housing Element Integration
+The 2023-2031 Housing Element (Chapter 9) contains:
+- ADU potential analysis and sites inventory
+- Streamlined permitting policies
+- Density and zoning tables
+- RHNA allocation data
+
+Search with: `search_general_plan` filtering `chapter: "9"`
+
+### 6. Budget Deep Dives
+The budget document includes:
+- **Section H**: Public Protection (Sheriff, DA, Probation, etc.)
+- **Section J**: Health and Public Assistance (H&SS)
+- **Section F**: General Government (Admin, IT, HR)
+
+Use `search_budget` with department filter for targeted results:
+```
+search_budget({ query: "pesticides", department: "Agricultural Commissioner" })
+```
+
+### 7. County Overview Visualization
+Generate county-wide context maps:
+```
+render_map({
+  extent: 'county',
+  layers: { countyBoundary: true, cityBoundary: true }
+})
+```
+Shows all 7 cities within county boundaries.
+
+## Quick Reference: Tool Combinations
+
+| Question Type | Tools to Combine |
+|---------------|------------------|
+| "Can I build X at [address]?" | geocode → get_zoning → get_flood_zone → get_fire_hazard_zone → get_county_code_sections |
+| "What's the policy on X?" | search_general_plan_policies → get_county_code_sections → search_budget |
+| "How is department X staffed?" | get_department → get_position_distribution → get_department_budget |
+| "Show me parcels with X criteria" | search_parcels → render_map (with sample APNs) |
+| "Who needs to be notified for my project?" | geocode → render_map (buffer) → get_parcels_in_buffer |
+| "Create a visual of X" | get_department/search_parcels → generate_infographic |
+| "Compare departments X and Y" | compare_departments → get_department_budget (for each) |
