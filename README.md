@@ -7,24 +7,26 @@ A Claude Code plugin that provides AI-powered GIS assistant capabilities for Sol
 ## What This Plugin Provides
 
 - **Skill**: Domain knowledge for interpreting GIS data, zoning codes, flood zones, fire hazards, and Solano County organizational structure
-- **MCP Server**: Connection to the hosted SAGE API with 25+ GIS and county data tools
+- **MCP Server**: Connection to the hosted SAGE API with 40+ GIS and county data tools
 
-## Installation
+## Quick Start
 
-### Option 1: Install from Marketplace (Recommended)
+**Requires [Claude Code](https://code.claude.com/docs/en/quickstart) or [Claude Desktop](https://code.claude.com/docs/en/desktop)**
 
 ```shell
 /plugin marketplace add exoria-ai/sage-plugin
 /plugin install sage@exoria-ai-sage-plugin
 ```
 
-### Option 2: Manual Installation
+That's it! Start asking questions about Solano County properties, zoning, hazards, budgets, and more.
 
-1. Clone this repository
-2. Run Claude Code with the plugin directory:
-   ```bash
-   claude --plugin-dir /path/to/sage-plugin
-   ```
+## Alternative: Manual Installation
+
+For development or testing:
+
+```bash
+claude --plugin-dir /path/to/sage-plugin
+```
 
 ## Available Tools
 
