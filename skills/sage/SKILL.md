@@ -180,6 +180,12 @@ These tools run serverless GeoPandas for heavy GIS operations. Use them to creat
 
 When you need detailed information on these topics, read the corresponding reference file:
 
+### Property & Assessment System
+- **Aumentum system, parcel fields, CAMA** → `references/aumentum-parcels.md`
+- **Prop 13 / assessed values** → `references/prop13.md`
+- **Zoning codes and meanings** → `references/zoning-codes.md`
+- **ADU (granny unit) rules** → `references/adu-rules.md`
+
 ### Geographic Context
 - **Spatial orientation / "Where is X?"** → `references/spatial-grounding.md`
 - **Detailed county history/demographics** → `references/solano-county-encyclopedia.md`
@@ -188,11 +194,6 @@ When you need detailed information on these topics, read the corresponding refer
 
 ### County Organization
 - **Departments, leadership, org chart** → `references/org-structure.md`
-
-### Property & Zoning
-- **Zoning codes and meanings** → `references/zoning-codes.md`
-- **Prop 13 / assessed values** → `references/prop13.md`
-- **ADU (granny unit) rules** → `references/adu-rules.md`
 
 ### Policy & Regulations
 - **General Plan structure and usage** → `references/general-plan.md`
