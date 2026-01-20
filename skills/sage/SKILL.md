@@ -138,6 +138,43 @@ You have access to these MCP tools organized by category:
 | `generate_infographic` | Create diagrams and visualizations |
 | `edit_image` | Edit or combine images |
 | `render_map` | Generate static map images |
+| `get_interactive_map_url` | Link to interactive map explorer |
+
+### Geoprocessing Tools (Server-side GIS)
+| Tool | Purpose |
+|------|---------|
+| `dissolve_layer` | Dissolve shapefiles by attribute to create boundaries |
+| `inspect_layer` | Inspect shapefile fields and dissolve candidates |
+
+**Geoprocessing Capabilities:**
+These tools run serverless GeoPandas for heavy GIS operations. Use them to create derived layers from source data.
+
+**Dissolve Operation**: Merge polygons that share an attribute value. For example, dissolve 152k parcels by school district code to create 9 school district boundary polygons.
+
+**Available Datasets** (shorthand names):
+- `parcels` - Aumentum parcel data (152k features, 89 fields)
+- `zoning` - Unincorporated county zoning
+- `generalPlan` - General Plan designations
+- `supervisorDistricts` - BOS districts
+- `cityBoundary` - City boundaries
+- `countyBoundary` - County boundary
+- `roads` - Road centerlines
+- `addresses` - Address points
+
+**Common Dissolve Fields** (for parcels):
+| Field | Description |
+|-------|-------------|
+| `f_school` / `d_school` | School district code / name |
+| `fund_fire` / `desc_fire` | Fire district code / name |
+| `fund_water` / `desc_water` | Water district code / name |
+| `wa_status` | Williamson Act status |
+| `sitecity` | City name (creates city boundaries) |
+| `use_desc` | Land use description |
+
+**Output**: Returns a URL to a GeoJSON file stored in cloud storage. This URL can be:
+- Viewed in geojson.io
+- Added to ArcGIS Online as a hosted feature layer (Content → Add Item → URL → GeoJSON)
+- Used in `render_map` via `additionalLayers` parameter
 
 ## Knowledge Domains
 
@@ -221,6 +258,23 @@ Navigate complex subdivision requirements:
 3. `search_general_plan` → Land Use chapter on subdivision policies
 4. `get_parcel_details` → Current parcel configuration
 5. Explain: Exemption eligibility, process, fees, contacts
+
+### Pattern 5: Create Derived Boundary Layers
+Generate new GIS layers from parcel data:
+
+```
+Inspect Fields → Dissolve → GeoJSON URL → Add to AGOL
+```
+
+**Example**: "Create a school district boundaries layer"
+1. `inspect_layer` → dataset: "parcels" to see available fields
+2. `dissolve_layer` → dataset: "parcels", dissolve_field: "f_school", output_name: "school_districts"
+3. Result: GeoJSON URL with 9 school district polygons
+4. User can add to ArcGIS Online: Content → Add Item → URL → paste GeoJSON URL
+
+**Example**: "Create fire district boundaries"
+1. `dissolve_layer` → dataset: "parcels", dissolve_field: "desc_fire", output_name: "fire_districts"
+2. Returns URL to simplified fire district polygons
 
 ## Standard Response Format
 
@@ -404,6 +458,35 @@ render_map({
 ```
 Shows all 7 cities within county boundaries.
 
+### 8. Serverless Geoprocessing
+Create derived boundary layers from source data using `dissolve_layer`:
+
+**Create school district boundaries from parcels:**
+```
+dissolve_layer({
+  dataset: "parcels",
+  dissolve_field: "f_school",
+  output_name: "school_districts"
+})
+```
+→ Merges 152,738 parcels into 9 school district polygons
+→ Returns GeoJSON URL: `https://...blob.vercel-storage.com/gis/school_districts.geojson`
+
+**Publishing to ArcGIS Online:**
+The returned GeoJSON URL can be directly added to AGOL:
+1. Go to Content → Add Item → From URL
+2. Paste the GeoJSON URL
+3. Choose "GeoJSON" as type
+4. Select "Add data and create a hosted feature layer"
+5. Configure title, tags, and sharing
+
+**Available dissolve datasets:**
+- `parcels` (152k features) - richest data with 89 fields
+- `zoning`, `generalPlan`, `supervisorDistricts`, `cityBoundary`, `countyBoundary`
+
+**Inspect before dissolving:**
+Use `inspect_layer` to see available fields and their unique value counts. Fields with 2-100 unique values are good dissolve candidates.
+
 ## Quick Reference: Tool Combinations
 
 | Question Type | Tools to Combine |
@@ -417,3 +500,5 @@ Shows all 7 cities within county boundaries.
 | "Compare departments X and Y" | compare_departments → get_department_budget (for each) |
 | "What GIS layers exist for X?" | search_gis_layers OR find_layers_for_question → get_gis_layer_details |
 | "Show layer X on a map" | get_gis_layer_details → render_map (with additionalLayers) |
+| "Create X district boundaries" | inspect_layer → dissolve_layer → provide GeoJSON URL |
+| "What fields can I dissolve by?" | inspect_layer (parcels) → lists 89 fields with dissolve candidates |
