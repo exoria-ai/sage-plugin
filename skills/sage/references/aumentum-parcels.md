@@ -18,10 +18,16 @@ Aumentum is an enterprise property tax platform that manages the complete proper
 ### Solano County Implementation
 
 - **Go-Live**: 2023 (replaced legacy SCIPS system)
+- **Internal Name**: CATS (County Assessment Tax System)
 - **Investment**: ~$10 million multi-year project
+- **Annual Hosting**: $616,000/year (DoIT budget line item)
 - **Assessment Roll**: $77.96 billion (FY2025-26)
 - **Parcels**: ~152,738 parcels
 - **Stakeholders**: Assessor-Recorder, Auditor-Controller, Treasurer-Tax Collector, DoIT
+
+### Aumentum Market Context
+
+Aumentum Technologies (acquired by Harris Computer in 2019) serves hundreds of jurisdictions across 29 US states. In California, other Aumentum users include Riverside County and Mendocino County. The CAMA market is fragmented—competitors include Tyler Technologies (iasWorld), Thomson Reuters, and various legacy systems. Aumentum tends to target mid-to-large counties with complex assessment needs.
 
 ### How Data Flows
 
@@ -36,6 +42,62 @@ Building Permits, Deeds → Assessor (Valuation) → Assessment Roll (July 1)
                                               (County, Schools, Cities, Districts)
 ```
 
+### GIS-CAMA Integration Workflow
+
+The parcel data involves coordination between multiple departments and contractors:
+
+**Staffing (from FY2025-26 Budget):**
+
+| Department | Role | Staff |
+|------------|------|-------|
+| Assessor/Recorder | Appraisal & valuation | 49 FTE (16 Appraisers, 2 Cadastral Mapping Techs) |
+| DoIT GIS Division | Parcel geometry, map services | 5 FTE (incl. 1 Cadastral Mapping Tech) |
+| GTG Contractor | QA/QC, parcel maintenance | $416,000/year contract |
+| County Surveyor | Legal boundary surveys | 1 FTE (in Public Works) |
+
+**Likely Parcel Maintenance Flow:**
+
+```
+     DEED RECORDED (Recorder Division)
+                  │
+    ┌─────────────┴─────────────┐
+    ▼                           ▼
+┌─────────────────┐    ┌─────────────────┐
+│ ASSESSOR        │    │ DoIT GIS + GTG  │
+│ Cadastral (2)   │    │ Cadastral (1+)  │
+│ • New APNs      │    │ • Edit polygons │
+│ • Legal desc    │    │ • Split/merge   │
+│ • Update CATS   │    │ • QA/QC         │
+└────────┬────────┘    └────────┬────────┘
+         │                      │
+         ▼                      ▼
+   ┌───────────┐         ┌───────────┐
+   │ AUMENTUM  │         │ ArcGIS    │
+   │ (CATS)    │◄───────►│ Enterprise│
+   │ SQL Server│  APN    │ Geodatabase│
+   └─────┬─────┘  Join   └─────┬─────┘
+         │                     │
+         └──────────┬──────────┘
+                    ▼
+         ┌─────────────────────┐
+         │  MONTHLY SYNC (ETL) │
+         │  Join on parcelid   │
+         └──────────┬──────────┘
+                    ▼
+         ┌─────────────────────┐
+         │ Parcels_Public_     │
+         │ Aumentum (ArcGIS    │
+         │ Feature Service)    │
+         └─────────────────────┘
+```
+
+**Evidence for this workflow:**
+- `c_user`, `last_edit` fields show GTG contractor emails (e.g., ecolaiacomo@geotg.com)
+- `gtg_review`, `gtg_notes` fields exist for QA tracking
+- Budget shows separate line items: $616K Aumentum hosting (DoIT) + $416K GIS consulting (GTG)
+- Two cadastral mapping techs in Assessor, one in DoIT GIS—suggests split responsibility
+- `gis_acre` vs `acres` fields indicate GIS-calculated vs legal/deeded values maintained separately
+
 ---
 
 ## Parcel Data Layer
@@ -45,7 +107,14 @@ Building Permits, Deeds → Assessor (Valuation) → Assessment Roll (July 1)
 **Features**: 152,738 parcels
 **Fields**: 89 attributes
 **Update Frequency**: Monthly
-**Data Steward**: Solano County DoIT + Geographic Technologies Group (GTG)
+**Data Steward**: Solano County DoIT GIS Division + Geographic Technologies Group (GTG)
+
+**Related Budget Items (FY2025-26):**
+- $416,000 - GIS consulting services (GTG)
+- $249,000 - GIS flyover (aerial imagery)
+- $160,000 - NV5 Geospatial cloud services
+- $128,000 - ESRI software maintenance
+- $96,000 - GIS derivative products
 
 ---
 
@@ -275,13 +344,29 @@ The building characteristics (bedrooms, bathrooms, sq ft) come from Assessor rec
 ## Data Quality Notes
 
 ### Monthly Updates
-The parcel layer is updated monthly. Recent property transfers, new construction, or boundary changes may take 1-2 months to appear.
+The parcel layer is updated monthly. Recent property transfers, new construction, or boundary changes may take 1-2 months to appear. The Assessor's office has noted ongoing work to reduce backlogs from the 2023 CATS implementation.
 
 ### GTG Review
-Geographic Technologies Group (GTG) serves as data steward, maintaining geometry quality and attribute accuracy. Review notes in `gtg_review` and `gtg_notes` indicate parcels needing attention.
+Geographic Technologies Group (GTG) is a Raleigh, NC-based GIS consulting firm (Esri Gold Partner) that provides outsourced cadastral mapping services to local governments. GTG maintains geometry quality and attribute accuracy under a $416K annual contract with Solano County.
+
+Review notes in `gtg_review` indicate parcels needing attention:
+- "Needs further review"
+- "Topology exception"
+- "Adjacent parcel missing"
+- "No GIS Primary Table APN Match"
+
+The `gtg_notes` field captures specific issues like "In Water", "Condo/Business Park", or "Encroachment".
+
+### Known Data Quality Issues
+The `sitecity` field has inconsistent spelling (37 values instead of ~8 expected):
+- BENICIA vs BENECIA
+- FAIRFIELD vs FAIFIELD vs FAIRIFLED
+- BIRDS LANDING vs BIRDS LNDG vs BIRDSLANDING
+
+This is typical CAMA data entry drift—use `tac_city` for cleaner city groupings.
 
 ### Coordinate Accuracy
-Parcel boundaries are maintained in California State Plane III (NAD83). Centroid coordinates (`xcentroid`, `ycentroid`) are in WGS84 for GIS compatibility.
+Parcel boundaries are maintained in California State Plane III (NAD83), EPSG:6418. Centroid coordinates (`xcentroid`, `ycentroid`) are in WGS84 for GIS compatibility.
 
 ---
 
@@ -289,8 +374,18 @@ Parcel boundaries are maintained in California State Plane III (NAD83). Centroid
 
 - **Property Lookup Portal**: https://ca-solano.publicaccessnow.com/
 - **Assessor Contact**: (707) 784-6210
-- **GIS Data Download**: Available through Solano Regional GIS Consortium
+- **GIS Data Download**: Available through Solano Regional GIS Consortium (ReGIS)
 - **Tax Collector**: (707) 784-7485
+
+### Key Personnel (FY2025-26)
+- **Glenn Zook** - Assessor/Recorder (elected)
+- **Timothy P. Flanagan** - Chief Information Officer (DoIT)
+- **Charles Lomeli** - Tax Collector/County Clerk
+
+### Vendor Information
+- **Aumentum Technologies** - CAMA software vendor (owned by Harris Computer since 2019)
+- **Geographic Technologies Group (GTG)** - GIS data steward contractor
+- **NV5 Geospatial** - Cloud GIS services
 
 ---
 
@@ -310,3 +405,18 @@ A: Use `dissolve_layer` with fields like `f_school`, `desc_fire`, or `fund_water
 
 **Q: Where do the district codes come from?**
 A: District fund codes are maintained by the Auditor-Controller's office and linked to parcels in Aumentum for tax apportionment.
+
+**Q: What is CATS?**
+A: CATS (County Assessment Tax System) is Solano County's internal name for their Aumentum implementation.
+
+**Q: Who maintains the parcel geometry vs attributes?**
+A: It's split—the Assessor's Office cadastral techs maintain the assessment data in Aumentum, while DoIT GIS and the GTG contractor maintain the polygon geometry in ArcGIS. The two systems sync monthly using the APN (parcelid) as the join key.
+
+**Q: Why does Solano outsource GIS to GTG?**
+A: Many mid-size counties use contractors like GTG to supplement limited in-house GIS staff. GTG specializes in cadastral mapping for local governments. Solano's DoIT GIS division has only 5 FTE covering all county GIS needs—the $416K GTG contract provides additional capacity for parcel maintenance.
+
+---
+
+## Etymology
+
+The name "Aumentum" derives from Latin *augmentum* meaning "increase, growth, augmentation" (from *augere* - to increase, enlarge). The company was founded in 1972 and was acquired by Harris Computer Corporation in 2019.
