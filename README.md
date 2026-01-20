@@ -93,6 +93,22 @@ The plugin includes detailed reference materials on:
 - County contacts
 - Standard disclaimers
 
+## Development
+
+### Versioning
+
+The plugin version is in `.claude-plugin/plugin.json`. Bump the version to trigger a plugin cache refresh for users:
+
+```bash
+# Edit .claude-plugin/plugin.json, increment "version"
+git add -A && git commit -m "Bump version to X.Y.Z" && git push
+```
+
+Users update via:
+```shell
+/plugin update sage@exoria-ai-sage-plugin
+```
+
 ## Requirements
 
 - Claude Code v1.0.33 or later
