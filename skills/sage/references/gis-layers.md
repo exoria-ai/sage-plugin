@@ -16,7 +16,7 @@ SAGE now has a **67-layer catalog** with metadata, service URLs, and field defin
 | `list_gis_layers` | List layers by category or priority |
 | `search_gis_layers` | Keyword search across all layers |
 | `get_gis_layer_details` | Full metadata, fields, service URL |
-| `find_layers_for_question` | Match user questions to relevant layers |
+| `suggest_layers` | Match user questions to relevant layers |
 
 ### Categories Available
 
@@ -192,7 +192,7 @@ Always specify `inSR: 4326` when querying with lat/long coordinates.
 ### "What layers answer this question?"
 
 ```javascript
-find_layers_for_question({
+suggest_layers({
   question: "Is this property in a flood zone?"
 })
 // Returns: FEMA flood zones, local floodplains

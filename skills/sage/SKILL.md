@@ -52,9 +52,9 @@ You have access to these MCP tools organized by category:
 | `get_fire_hazard_zone` | CAL FIRE FHSZ classification |
 | `get_supervisor_district` | Board of Supervisors district |
 | `get_special_districts` | Fire, water, school, and other districts |
-| `get_nearby` | Find schools, parks, fire stations nearby |
+| `find_nearby` | Find schools, parks, fire stations nearby |
 | `search_parcels` | Search parcels by criteria (zoning, acreage, value) |
-| `get_parcels_in_buffer` | Parcels within radius (for notification lists) |
+| `find_nearby_parcels` | Parcels within radius (for notification lists) |
 | `render_map` | Generate static map images |
 
 ### GIS Layer Discovery Tools
@@ -64,7 +64,7 @@ You have access to these MCP tools organized by category:
 | `list_gis_layers` | List layers by category or priority |
 | `search_gis_layers` | Keyword search across 67 layers |
 | `get_gis_layer_details` | Service URL, fields, geometry type |
-| `find_layers_for_question` | Match user questions to relevant layers |
+| `suggest_layers` | Match user questions to relevant layers |
 
 **Layer Categories:** property, zoning (16 layers), hazards (7), districts (6), services (3), poi (10), infrastructure (5), emergency (4), environmental (3), demographics (2), basemap (1)
 
@@ -371,7 +371,7 @@ When using `render_map`:
 - Enable `layers: { aerial2025: true }` for 2025 high-res Solano County aerial imagery (clearer than default basemaps when zoomed in on parcels)
 - Always include the `imageUrl` in your response
 
-**For buffer/notification maps**: Use `render_map` with buffer parameter directly - it handles the spatial query internally. Only use `get_parcels_in_buffer` if you need owner names/addresses for notification lists.
+**For buffer/notification maps**: Use `render_map` with buffer parameter directly - it handles the spatial query internally. Only use `find_nearby_parcels` if you need owner names/addresses for notification lists.
 
 **Note**: If APN-based buffer fails, use coordinates instead: `buffer: { latitude: X, longitude: Y, radius_feet: 500 }`
 
@@ -496,10 +496,10 @@ Use `inspect_layer` to see available fields and their unique value counts. Field
 | "What's the policy on X?" | search_general_plan_policies → get_county_code_sections → search_budget |
 | "How is department X staffed?" | get_department → get_position_distribution → get_department_budget |
 | "Show me parcels with X criteria" | search_parcels → render_map (with sample APNs) |
-| "Who needs to be notified for my project?" | geocode → render_map (buffer) → get_parcels_in_buffer |
+| "Who needs to be notified for my project?" | geocode → render_map (buffer) → find_nearby_parcels |
 | "Create a visual of X" | get_department/search_parcels → generate_infographic |
 | "Compare departments X and Y" | compare_departments → get_department_budget (for each) |
-| "What GIS layers exist for X?" | search_gis_layers OR find_layers_for_question → get_gis_layer_details |
+| "What GIS layers exist for X?" | search_gis_layers OR suggest_layers → get_gis_layer_details |
 | "Show layer X on a map" | get_gis_layer_details → render_map (with additionalLayers) |
 | "Create X district boundaries" | inspect_layer → dissolve_layer → provide GeoJSON URL |
 | "What fields can I dissolve by?" | inspect_layer (parcels) → lists 89 fields with dissolve candidates |

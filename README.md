@@ -40,9 +40,9 @@ Once installed, you'll have access to these MCP tools:
 - `get_fire_hazard_zone` - CAL FIRE FHSZ classification
 - `get_supervisor_district` - Board of Supervisors district
 - `get_special_districts` - Fire, water, school districts
-- `get_nearby` - Find schools, parks, fire stations nearby
+- `find_nearby` - Find schools, parks, fire stations nearby
 - `search_parcels` - Search parcels by criteria
-- `get_parcels_in_buffer` - Parcels within radius (notification lists)
+- `find_nearby_parcels` - Parcels within radius (notification lists)
 - `render_map` - Generate static map images
 
 ### GIS Layer Discovery
@@ -50,7 +50,7 @@ Once installed, you'll have access to these MCP tools:
 - `list_gis_layers` - List layers by category or priority
 - `search_gis_layers` - Keyword search across 67 layers
 - `get_gis_layer_details` - Service URL, fields, metadata
-- `find_layers_for_question` - Match questions to relevant layers
+- `suggest_layers` - Match questions to relevant layers
 
 ### County Code
 - `get_county_code_sections` - Full text of code sections
