@@ -55,7 +55,7 @@ You have access to these MCP tools organized by category:
 | `find_nearby` | Find schools, parks, fire stations nearby |
 | `search_parcels` | Search parcels by criteria (zoning, acreage, value) |
 | `find_nearby_parcels` | Parcels within radius (for notification lists) |
-| `render_map` | Generate static map images |
+| `capture_map_view` | Generate static map images for AI spatial analysis |
 
 ### GIS Layer Discovery Tools
 | Tool | Purpose |
@@ -63,8 +63,9 @@ You have access to these MCP tools organized by category:
 | `list_gis_categories` | Browse 11 layer categories with counts |
 | `list_gis_layers` | List layers by category or priority |
 | `search_gis_layers` | Keyword search across 67 layers |
-| `get_gis_layer_details` | Service URL, fields, geometry type |
+| `get_gis_layer_details` | Service URL, fields, geometry type, downloads |
 | `suggest_layers` | Match user questions to relevant layers |
+| `list_gis_downloads` | List datasets available for file download (Shapefile, GDB, LiDAR) |
 
 **Layer Categories:** property, zoning (16 layers), hazards (7), districts (6), services (3), poi (10), infrastructure (5), emergency (4), environmental (3), demographics (2), basemap (1)
 
@@ -195,7 +196,7 @@ When you need detailed information on these topics, read the corresponding refer
 - **Spatial orientation / "Where is X?"** → `references/spatial-grounding.md`
 - **Detailed county history/demographics** → `references/solano-county-encyclopedia.md`
 - **Jurisdiction routing** → `references/jurisdiction.md`
-- **GIS layers, querying, discovery** → `references/gis-layers.md`
+- **GIS layers, querying, discovery, downloads** → `references/gis-layers.md`
 - **Map tools (capture_map_view, interactive maps)** → `references/map-tools.md`
 
 ### County Organization
@@ -653,5 +654,6 @@ Use `inspect_layer` to see available fields and their unique value counts. Field
 | "Compare departments X and Y" | compare_departments → get_department_budget (for each) |
 | "What GIS layers exist for X?" | search_gis_layers OR suggest_layers → get_gis_layer_details |
 | "Show layer X on a map" | get_gis_layer_details → capture_map_view (with additionalLayers) |
+| "Download GIS data for X" | list_gis_downloads → get_gis_layer_details (for download URLs) |
 | "Create X district boundaries" | inspect_layer → dissolve_layer → provide GeoJSON URL |
 | "What fields can I dissolve by?" | inspect_layer (parcels) → lists 89 fields with dissolve candidates |

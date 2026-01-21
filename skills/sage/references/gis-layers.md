@@ -15,8 +15,9 @@ SAGE now has a **67-layer catalog** with metadata, service URLs, and field defin
 | `list_gis_categories` | Browse 11 categories with layer counts |
 | `list_gis_layers` | List layers by category or priority |
 | `search_gis_layers` | Keyword search across all layers |
-| `get_gis_layer_details` | Full metadata, fields, service URL |
+| `get_gis_layer_details` | Full metadata, fields, service URL, downloads |
 | `suggest_layers` | Match user questions to relevant layers |
+| `list_gis_downloads` | List datasets with file downloads (Shapefile, GDB, LiDAR) |
 
 ### Categories Available
 
@@ -46,6 +47,55 @@ User: "Is there a layer for fire stations?"
    → Returns: serviceUrl, fields, geometry type
 
 3. Use URL with capture_map_view additionalLayers or direct query
+```
+
+---
+
+## Data Downloads
+
+Many layers offer both **live service URLs** (for real-time queries) AND **file downloads** (for bulk analysis, offline work, desktop GIS).
+
+### Using list_gis_downloads
+
+```javascript
+// List all downloadable datasets
+list_gis_downloads()
+
+// Filter by format
+list_gis_downloads({ format: "shapefile" })
+list_gis_downloads({ format: "lidar" })
+
+// Filter by category
+list_gis_downloads({ category: "property" })
+```
+
+### Available Download Formats
+
+| Format | Extension | Best For |
+|--------|-----------|----------|
+| `shapefile` | .shp/.dbf/.shx in .zip | Industry standard, ArcGIS/QGIS |
+| `geodatabase` | .gdb in .zip | Esri workflows, richer data model |
+| `geojson` | .geojson | Web applications, JavaScript |
+| `csv` | .csv | Spreadsheets, tabular analysis |
+| `lidar` | .laz | Elevation analysis, 3D modeling |
+| `kml` | .kml/.kmz | Google Earth |
+
+### Key Downloadable Datasets
+
+- **Parcels** (shapefile/GDB) - 152k parcels with 89 fields
+- **Address Points** (shapefile) - Address geocoding data
+- **Road Centerlines** (shapefile) - Street network
+- **Zoning** (shapefile) - Unincorporated zoning districts
+- **General Plan** (shapefile) - Land use designations
+- **Supervisor Districts** (shapefile) - BOS district boundaries
+- **LiDAR** (LAZ) - 2023 USGS 3DEP point cloud data
+
+### Download Workflow
+
+```
+1. list_gis_downloads() → Find available datasets
+2. get_gis_layer_details({ layerId }) → Get download URLs
+3. Provide URL to user for direct download
 ```
 
 ---
@@ -224,6 +274,18 @@ capture_map_view({
     opacity: 0.6
   }]
 })
+```
+
+### "Download parcel data"
+
+```javascript
+// List downloadable datasets
+list_gis_downloads({ format: "shapefile" })
+// Returns: parcels, addresses, roads, etc.
+
+// Get specific download URL
+get_gis_layer_details({ layerId: "solano-parcels" })
+// Returns: downloads array with format, url, size
 ```
 
 ---
