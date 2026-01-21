@@ -132,13 +132,18 @@ You have access to these MCP tools organized by category:
 | `list_job_classes` | Job classifications with grades |
 | `compare_departments` | Side-by-side department comparison |
 
-### Visualization Tools
+### Map & Visualization Tools
 | Tool | Purpose |
 |------|---------|
+| `capture_map_view` | Generate static map images for AI spatial analysis |
+| `get_interactive_map_url` | Generate URL to interactive map for user exploration |
+| `list_map_presets` | List available interactive map presets |
 | `generate_infographic` | Create diagrams and visualizations |
 | `edit_image` | Edit or combine images |
-| `render_map` | Generate static map images |
-| `get_interactive_map_url` | Link to interactive map explorer |
+
+**Map Tool Choice:**
+- Use `capture_map_view` when YOU need to see the map (verify locations, assess spatial relationships)
+- Use `get_interactive_map_url` when the USER wants to explore (pan, zoom, toggle layers)
 
 ### Geoprocessing Tools (Server-side GIS)
 | Tool | Purpose |
@@ -191,6 +196,7 @@ When you need detailed information on these topics, read the corresponding refer
 - **Detailed county history/demographics** → `references/solano-county-encyclopedia.md`
 - **Jurisdiction routing** → `references/jurisdiction.md`
 - **GIS layers, querying, discovery** → `references/gis-layers.md`
+- **Map tools (capture_map_view, interactive maps)** → `references/map-tools.md`
 
 ### County Organization
 - **Departments, leadership, org chart** → `references/org-structure.md`
@@ -436,18 +442,85 @@ For detailed guidance on each sensitive topic, consult:
 3. Include the returned image URL in your response
 4. Offer to edit/refine if needed
 
-## Map Generation Tips
+## Map Tools Guide
 
-When using `render_map`:
-- Use `apn` parameter for single parcel focus
-- Use `buffer` parameter for notification radius visualization
-- Use `extent: 'county'` with boundaries for overview maps
-- Enable `layers: { aerial2025: true }` for 2025 high-res Solano County aerial imagery (clearer than default basemaps when zoomed in on parcels)
-- Always include the `imageUrl` in your response
+SAGE has two distinct mapping tools. Choose based on the purpose:
 
-**For buffer/notification maps**: Use `render_map` with buffer parameter directly - it handles the spatial query internally. Only use `find_nearby_parcels` if you need owner names/addresses for notification lists.
+### capture_map_view (Static Maps for AI Analysis)
 
-**Note**: If APN-based buffer fails, use coordinates instead: `buffer: { latitude: X, longitude: Y, radius_feet: 500 }`
+Use this when YOU need to visually verify or analyze something:
+
+```javascript
+// Verify a parcel location
+capture_map_view({ apn: "003-025-1020" })
+
+// See parcels in a notification buffer
+capture_map_view({ buffer: { apn: "003-025-1020", radius_feet: 300 } })
+
+// Check flood zones
+capture_map_view({
+  apn: "003-025-1020",
+  additionalLayers: [{
+    url: "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28",
+    title: "Flood Zones"
+  }]
+})
+
+// View with high-res aerial for detail
+capture_map_view({ apn: "003-025-1020", layers: { aerial2025: true } })
+
+// County overview
+capture_map_view({ extent: "county", layers: { countyBoundary: true, cityBoundary: true } })
+```
+
+**What you get back:**
+- The map image (displayed to you for analysis)
+- Spatial context: extent, scale, layers shown, area covered
+- An imageUrl to share with the user
+
+**Tips:**
+- Use `layers: { aerial2025: true }` for clearer detail when zoomed in on parcels
+- Use `buffer` parameter for notification maps - it handles the spatial query internally
+- If APN-based buffer fails, use coordinates: `buffer: { latitude: X, longitude: Y, radius_feet: 500 }`
+- Only use `find_nearby_parcels` if you need owner names/addresses for notification lists
+
+### get_interactive_map_url (User Exploration)
+
+Use this when the USER wants to explore interactively:
+
+```javascript
+// Simple parcel view
+get_interactive_map_url({ apn: "0001-011-180" })
+
+// Hazard assessment preset
+get_interactive_map_url({ apn: "0001-011-180", preset: "hazards" })
+
+// Address lookup
+get_interactive_map_url({ address: "675 Texas St, Fairfield, CA" })
+
+// Show driving route
+get_interactive_map_url({
+  origin: { longitude: -122.0, latitude: 38.2, label: "Start" },
+  destination: { longitude: -122.1, latitude: 38.3, label: "End" }
+})
+```
+
+**Presets available:**
+- `base` - Property Research (default): parcels, addresses, basic layers
+- `hazards` - Hazard Assessment: flood zones, fire hazard severity
+- `zoning` - Zoning Analysis: zoning districts, land use
+- `environmental` - Environmental Review: wetlands, habitat
+- `districts` - District Lookup: supervisor districts, service areas
+
+**Always share the returned URL with the user!**
+
+### Typical Workflow
+
+1. Use `capture_map_view` for quick visual verification
+2. Describe what you see to the user
+3. Offer `get_interactive_map_url` for further exploration
+
+For detailed parameter reference, see `references/map-tools.md`
 
 ## Advanced Capabilities
 
@@ -526,12 +599,17 @@ search_budget({ query: "pesticides", department: "Agricultural Commissioner" })
 ### 7. County Overview Visualization
 Generate county-wide context maps:
 ```
-render_map({
+capture_map_view({
   extent: 'county',
   layers: { countyBoundary: true, cityBoundary: true }
 })
 ```
 Shows all 7 cities within county boundaries.
+
+For user exploration, offer the interactive version:
+```
+get_interactive_map_url({ preset: 'districts' })
+```
 
 ### 8. Serverless Geoprocessing
 Create derived boundary layers from source data using `dissolve_layer`:
@@ -569,11 +647,11 @@ Use `inspect_layer` to see available fields and their unique value counts. Field
 | "Can I build X at [address]?" | geocode → get_zoning → get_flood_zone → get_fire_hazard_zone → get_county_code_sections |
 | "What's the policy on X?" | search_general_plan_policies → get_county_code_sections → search_budget |
 | "How is department X staffed?" | get_department → get_position_distribution → get_department_budget |
-| "Show me parcels with X criteria" | search_parcels → render_map (with sample APNs) |
-| "Who needs to be notified for my project?" | geocode → render_map (buffer) → find_nearby_parcels |
+| "Show me parcels with X criteria" | search_parcels → capture_map_view (with sample APNs) |
+| "Who needs to be notified for my project?" | geocode → capture_map_view (buffer) → find_nearby_parcels |
 | "Create a visual of X" | get_department/search_parcels → generate_infographic |
 | "Compare departments X and Y" | compare_departments → get_department_budget (for each) |
 | "What GIS layers exist for X?" | search_gis_layers OR suggest_layers → get_gis_layer_details |
-| "Show layer X on a map" | get_gis_layer_details → render_map (with additionalLayers) |
+| "Show layer X on a map" | get_gis_layer_details → capture_map_view (with additionalLayers) |
 | "Create X district boundaries" | inspect_layer → dissolve_layer → provide GeoJSON URL |
 | "What fields can I dissolve by?" | inspect_layer (parcels) → lists 89 fields with dissolve candidates |

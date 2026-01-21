@@ -45,7 +45,7 @@ User: "Is there a layer for fire stations?"
 2. get_gis_layer_details({ layerId: "solano-fire-stations" })
    → Returns: serviceUrl, fields, geometry type
 
-3. Use URL with render_map additionalLayers or direct query
+3. Use URL with capture_map_view additionalLayers or direct query
 ```
 
 ---
@@ -92,12 +92,12 @@ For layers where you need to find what polygon contains a point:
 
 **Best for:** Zoning, flood zones, fire hazard, districts, service areas
 
-### Using with render_map
+### Using with capture_map_view
 
-Once you have a service URL from `get_gis_layer_details`, use it with `render_map`:
+Once you have a service URL from `get_gis_layer_details`, use it with `capture_map_view`:
 
 ```javascript
-render_map({
+capture_map_view({
   apn: "003-025-1020",
   additionalLayers: [{
     url: "https://services2.arcgis.com/.../Fire_Stations/FeatureServer/0",
@@ -216,7 +216,7 @@ get_gis_layer_details({ layerId: "fema-flood-zones" })
 
 ```javascript
 // After getting URL from get_gis_layer_details:
-render_map({
+capture_map_view({
   apn: "003-025-1020",
   additionalLayers: [{
     url: result.serviceUrl,
