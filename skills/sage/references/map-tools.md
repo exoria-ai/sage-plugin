@@ -371,6 +371,166 @@ The service composites:
 
 ---
 
+## Multi-Scale Analysis: Thinking Like a GIS Analyst
+
+Maps render quickly and cheaply - don't hesitate to generate multiple views. Humans instinctively zoom in and out; as an AI, you need to deliberately work at multiple scales to get proper context.
+
+### The Scale Problem
+
+A single map view often fails to give complete context:
+- **Zoomed in** (parcel level): You see detail, labels, building footprints - but can't tell where in the county this is, or what surrounds it
+- **Zoomed out** (county level): You see regional patterns and layer coverage - but can't read parcel labels or see fine detail
+
+**Solution: Generate multiple maps at different scales, just like a human analyst would pan and zoom.**
+
+### Recommended Multi-Scale Workflow
+
+#### For Property/Parcel Questions
+
+1. **Parcel view (zoom 17-18)**: Start here for the specific property
+   ```javascript
+   capture_map_view({ apn: "012-805-010", zoom: 17 })
+   ```
+   - What: Parcel shape, neighboring parcels, street access
+   - Labels: APN labels visible, street names
+
+2. **Neighborhood view (zoom 14-15)**: Context
+   ```javascript
+   capture_map_view({ apn: "012-805-010", zoom: 14 })
+   ```
+   - What: Surrounding development pattern, distance to services
+   - Missing: Fine detail, may lose some labels
+
+3. **City/regional view (zoom 11-12)**: When relevant
+   ```javascript
+   capture_map_view({ apn: "012-805-010", zoom: 11, layers: { cityBoundary: true } })
+   ```
+   - What: City context, major roads, regional position
+
+#### For Hazard Assessment
+
+**Always start with county-wide view to understand layer coverage:**
+
+```javascript
+// First: County-wide hazard context
+capture_map_view({
+  extent: "county",
+  additionalLayers: [{
+    url: "https://services2.arcgis.com/SCn6czzcqKAFwdGU/ArcGIS/rest/services/FireHazardSeverityZone/FeatureServer/0",
+    title: "Fire Hazard Severity"
+  }],
+  layers: { cityBoundary: true, countyBoundary: true }
+})
+// This shows: Where are the high-risk areas in the county?
+// Is this property in a hotspot or isolated pocket?
+```
+
+```javascript
+// Then: Parcel-specific view
+capture_map_view({
+  apn: "012-805-010",
+  zoom: 15,
+  additionalLayers: [{
+    url: "https://services2.arcgis.com/SCn6czzcqKAFwdGU/ArcGIS/rest/services/FireHazardSeverityZone/FeatureServer/0",
+    title: "Fire Hazard Severity"
+  }]
+})
+// This shows: What exactly is this parcel's classification?
+```
+
+**Why this matters for hazards:**
+- Fire and flood zones have distinct spatial patterns
+- A parcel might be in a Very High fire zone, but so is half the county's western hills
+- Or it might be an isolated high-risk pocket surrounded by moderate areas
+- County view gives you interpretive context the parcel view can't provide
+
+### Key GIS Analyst Habits to Adopt
+
+1. **Verify layer coverage**: Before interpreting results, check if the layer even covers your area. Some layers have gaps.
+
+2. **Check neighboring parcels**: A property's context matters. Is this the only agricultural parcel in a residential area? Is it at the edge of a fire zone?
+
+3. **Use aerial for detail**: When zoomed in (17+), `aerial2025` gives much better visual context than basemap imagery.
+   ```javascript
+   capture_map_view({ apn: "012-805-010", zoom: 18, layers: { aerial2025: true } })
+   ```
+
+4. **Trust labels at appropriate zoom**: Parcel labels (APNs) become readable at zoom 16+. If you need to identify specific parcels, zoom in enough.
+
+5. **Multiple hazard layers together**: Fire and flood often affect different areas - show them together for complete assessment:
+   ```javascript
+   capture_map_view({
+     apn: "012-805-010",
+     zoom: 14,
+     additionalLayers: [
+       { url: "...FireHazardSeverityZone...", title: "Fire", opacity: 0.4 },
+       { url: "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28", title: "Flood", opacity: 0.4 }
+     ]
+   })
+   ```
+
+### Scale Reference Table
+
+| Question Type | Start Zoom | Also Check |
+|--------------|------------|------------|
+| "What's the zoning for this parcel?" | 17 | 14 (neighborhood pattern) |
+| "Is this in a flood zone?" | 15, then county | County view first |
+| "Is this in a fire hazard zone?" | 15, then county | County view first |
+| "Where exactly is this property?" | 17 (detail), 12 (regional) | Both needed |
+| "What's around this parcel?" | 14-15 | - |
+| "Show me the buffer/notification area" | 17 | - |
+| "What's the development pattern here?" | 13-14 | - |
+| "County-wide overview of X" | 10 (county extent) | - |
+
+### Example: Complete Hazard Assessment
+
+For a thorough hazard assessment, generate 3 maps:
+
+```javascript
+// 1. County fire hazard context
+capture_map_view({
+  extent: "county",
+  additionalLayers: [{ url: "...FireHazardSeverityZone...", opacity: 0.5 }],
+  layers: { cityBoundary: true }
+})
+// "Looking at the county-wide fire hazard map, high-risk areas (red/orange)
+// are concentrated in the western hills and Suisun Marsh edges..."
+
+// 2. Property fire hazard detail
+capture_map_view({
+  apn: "012-805-010",
+  zoom: 15,
+  additionalLayers: [{ url: "...FireHazardSeverityZone...", opacity: 0.5 }]
+})
+// "Your specific parcel is in the Moderate zone (yellow), at the transition
+// between the High zone to the west and the urban area to the east..."
+
+// 3. Property flood hazard detail
+capture_map_view({
+  apn: "012-805-010",
+  zoom: 15,
+  additionalLayers: [{ url: "https://hazards.fema.gov/.../NFHL/MapServer/28", opacity: 0.5 }]
+})
+// "The FEMA flood map shows this parcel is in Zone X (minimal flood hazard)..."
+```
+
+### Available Hazard Layers
+
+For reference, these hazard layers are available for visualization:
+
+| Hazard | Layer URL | Notes |
+|--------|-----------|-------|
+| Fire (Current) | `services2.arcgis.com/SCn6czzcqKAFwdGU/.../FireHazardSeverityZone/FeatureServer/0` | CAL FIRE FHSZ |
+| Fire (2025 Phase 2) | `services2.arcgis.com/SCn6czzcqKAFwdGU/.../FireHazardSeverityZone_Phase2_2025/FeatureServer/0` | Latest data |
+| FEMA Flood | `hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28` | Official NFHL |
+| CA 100-Year Flood | `services.gis.ca.gov/arcgis/rest/services/InlandWaters/Flood_Risk_State/MapServer/0` | State data |
+| CA 200-Year Flood | `services.gis.ca.gov/arcgis/rest/services/InlandWaters/Flood_Risk_State/MapServer/1` | State data |
+| County Floodplains | `services2.arcgis.com/SCn6czzcqKAFwdGU/.../Floodplains/FeatureServer/0` | Local data |
+| Earthquake Faults | `services2.arcgis.com/zr3KAIbsRSUyARHG/.../CGS_Alquist_Priolo_Fault_Zones/FeatureServer/0` | CGS data |
+| Wildlife Hazard | `services2.arcgis.com/SCn6czzcqKAFwdGU/.../BirdStrikeHazardZone/FeatureServer/0` | Travis AFB |
+
+---
+
 ## Troubleshooting
 
 ### "APN not found"

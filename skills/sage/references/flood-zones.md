@@ -143,3 +143,21 @@ A: You can appeal through the LOMA/LOMR process. Contact your local floodplain a
 
 **Q: Does flood insurance cover everything?**
 A: No. NFIP has coverage limits ($250K building, $100K contents for residential). It doesn't cover temporary housing, business interruption, or vehicles.
+
+## GIS Layer URLs for Visualization
+
+When using `capture_map_view` to visualize flood zones:
+
+| Layer | URL | Source |
+|-------|-----|--------|
+| FEMA NFHL (Official) | `https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28` | FEMA |
+| California 100-Year Floodplain | `https://services.gis.ca.gov/arcgis/rest/services/InlandWaters/Flood_Risk_State/MapServer/0` | CA DWR |
+| California 200-Year Floodplain | `https://services.gis.ca.gov/arcgis/rest/services/InlandWaters/Flood_Risk_State/MapServer/1` | CA DWR |
+| County Floodplains (Local) | `https://services2.arcgis.com/SCn6czzcqKAFwdGU/ArcGIS/rest/services/Floodplains/FeatureServer/0` | Solano County |
+
+**Map Rendering Tips:**
+- Use opacity 0.4-0.6 for good visibility while still seeing parcels
+- FEMA layer uses blue tints (darker = higher risk zones like AE, lighter = Zone X)
+- State layers show simplified 100/200-year boundaries
+- County layer may have more local detail for smaller drainages
+- Consider county-wide view first to see flood patterns (concentrated along waterways, delta, marsh)

@@ -239,3 +239,18 @@ The FHSZ model is developed under Public Resources Code 4201-4204 (SRA) and Gove
 - Public Resources Code 4201-4204
 - Government Code 51175-51189
 - California Code of Regulations Title 14, Section 1280
+
+## GIS Layer URLs for Visualization
+
+When using `capture_map_view` to visualize fire hazard zones:
+
+| Layer | URL |
+|-------|-----|
+| Fire Hazard Severity (Current) | `https://services2.arcgis.com/SCn6czzcqKAFwdGU/ArcGIS/rest/services/FireHazardSeverityZone/FeatureServer/0` |
+| Fire Hazard Phase 2 2025 | `https://services2.arcgis.com/SCn6czzcqKAFwdGU/ArcGIS/rest/services/FireHazardSeverityZone_Phase2_2025/FeatureServer/0` |
+
+**Map Rendering Tips:**
+- Use opacity 0.5-0.6 for good visibility while still seeing underlying parcels
+- Always show county-wide view first to understand the regional fire hazard pattern
+- Red = Very High, Orange = High, Yellow = Moderate
+- The 2025 Phase 2 layer has the most current CAL FIRE data

@@ -160,6 +160,8 @@ You have access to these MCP tools organized by category:
 - Use `capture_map_view` when YOU need to see the map (verify locations, assess spatial relationships)
 - Use `get_interactive_map_url` when the USER wants to explore (pan, zoom, toggle layers)
 
+**Multi-Scale Analysis:** Maps are cheap and fast - don't rely on single views. For hazard assessments, always check county-wide first (to understand patterns), then zoom to the parcel. See `references/map-tools.md` for detailed guidance.
+
 ### Geoprocessing Tools (Server-side GIS)
 | Tool | Purpose |
 |------|---------|
