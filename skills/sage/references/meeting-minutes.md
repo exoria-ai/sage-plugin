@@ -6,7 +6,7 @@ SAGE provides access to searchable meeting minutes from Solano County committees
 
 | Committee ID | Name | Meetings | Date Range |
 |--------------|------|----------|------------|
-| `bos` | Board of Supervisors | 38 | 2025-01-07 to 2026-01-13 |
+| `bos` | Board of Supervisors | 68 | 2024-01-09 to 2026-01-13 |
 | `regis` | ReGIS Members (Regional GIS Consortium) | 30 | 2021-06-16 to 2026-01-21 |
 
 ## Meeting Tools
@@ -206,7 +206,7 @@ Link General Plan/Code to Board actions:
 
 ### Board of Supervisors
 - **Source**: Solano County Granicus system
-- **Date Range**: January 2025 - January 2026
+- **Date Range**: January 2024 - January 2026
 - **Documents**: Agendas and approved minutes
 - **Update Frequency**: New meetings added periodically
 
@@ -220,7 +220,7 @@ Link General Plan/Code to Board actions:
 
 1. **Text-only**: Meeting content is extracted from PDFs; formatting/tables may not be preserved
 2. **No attachments**: Staff reports, resolutions, and other attachments are not included
-3. **Historical depth**: BOS coverage starts January 2025; earlier meetings not yet indexed
+3. **Historical depth**: BOS coverage starts January 2024; earlier meetings not yet indexed
 4. **Vote details**: Vote tallies may not be captured for all items
 5. **Search is keyword-based**: Use specific terms rather than natural language questions
 

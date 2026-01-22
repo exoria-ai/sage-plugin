@@ -133,7 +133,7 @@ You have access to these MCP tools organized by category:
 | `get_meetings_overview` | Statistics across all committees |
 
 **Available Committees:**
-- **Board of Supervisors (bos)**: 38 meetings, 2025-2026
+- **Board of Supervisors (bos)**: 68 meetings, 2024-2026
 - **ReGIS Members (regis)**: 30 meetings, 2021-2026
 
 ### Staffing & Org Chart Tools
