@@ -122,6 +122,20 @@ You have access to these MCP tools organized by category:
 | `get_budget_chunk` | Full chunk by ID |
 | `get_department_budget` | Complete department budget details |
 
+### Meeting Minutes Tools
+| Tool | Purpose |
+|------|---------|
+| `list_committees` | List available committees (BOS, ReGIS) |
+| `list_meetings` | List meetings by committee or year |
+| `search_meeting_minutes` | Search agendas and minutes with filters |
+| `get_meeting` | Get all content for a specific meeting |
+| `get_meeting_chunk` | Full text of specific chunk by ID |
+| `get_meetings_overview` | Statistics across all committees |
+
+**Available Committees:**
+- **Board of Supervisors (bos)**: 38 meetings, 2025-2026
+- **ReGIS Members (regis)**: 30 meetings, 2021-2026
+
 ### Staffing & Org Chart Tools
 | Tool | Purpose |
 |------|---------|
@@ -206,6 +220,9 @@ When you need detailed information on these topics, read the corresponding refer
 - **General Plan structure and usage** → `references/general-plan.md`
 - **County Code chapter guide** → `references/county-code-chapters.md`
 
+### Board Meetings & Decisions
+- **Meeting minutes tools and usage** → `references/meeting-minutes.md`
+
 ### Hazards & Environment
 - **Flood zones (FEMA)** → `references/flood-zones.md`
 - **Fire hazard zones (CAL FIRE)** → `references/fire-hazard.md`
@@ -283,6 +300,24 @@ Inspect Fields → Dissolve → GeoJSON URL → Add to AGOL
 **Example**: "Create fire district boundaries"
 1. `dissolve_layer` → dataset: "parcels", dissolve_field: "desc_fire", output_name: "fire_districts"
 2. Returns URL to simplified fire district polygons
+
+### Pattern 6: Research Board Decisions
+Track what the Board of Supervisors decided on a topic:
+
+```
+Search Minutes → Review Decisions → Link to Policy/Budget
+```
+
+**Example**: "What has the Board decided about housing?"
+1. `search_meeting_minutes` → query: "housing", committee: "bos", document_type: "minutes"
+2. `get_meeting_chunk` → Full text of relevant agenda items
+3. `search_general_plan` → Housing Element policies
+4. Explain: Board actions, policy context, implementation status
+
+**Example**: "Track a specific resolution"
+1. `search_meeting_minutes` → query: "resolution 2025-253"
+2. `get_meeting` → Full meeting content for context
+3. Link to related budget or code changes if applicable
 
 ## Standard Response Format
 
@@ -657,3 +692,6 @@ Use `inspect_layer` to see available fields and their unique value counts. Field
 | "Download GIS data for X" | list_gis_downloads → get_gis_layer_details (for download URLs) |
 | "Create X district boundaries" | inspect_layer → dissolve_layer → provide GeoJSON URL |
 | "What fields can I dissolve by?" | inspect_layer (parcels) → lists 89 fields with dissolve candidates |
+| "What did the Board decide about X?" | search_meeting_minutes (bos) → get_meeting_chunk → link to policy |
+| "What meetings discussed X?" | search_meeting_minutes → list_meetings → get_meeting |
+| "Show me recent BOS actions" | list_meetings (bos, 2025) → get_meeting (minutes) |
