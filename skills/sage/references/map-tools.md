@@ -238,7 +238,7 @@ Generates a URL to open the SAGE interactive map application where users can pan
 | Parameter | Description | Example |
 |-----------|-------------|---------|
 | `preset` | Map preset/theme | `"hazards"` |
-| `apn` | Highlight and zoom to parcel | `"0001-011-180"` |
+| `apns` | Array of APNs to highlight (supports multiple!) | `["0027030010", "0027040010"]` |
 | `address` | Geocode and highlight | `"675 Texas St, Fairfield, CA"` |
 | `center` | Initial map center | `{ longitude: -122.0, latitude: 38.25 }` |
 | `zoom` | Initial zoom (1-20) | `17` |
@@ -247,16 +247,26 @@ Generates a URL to open the SAGE interactive map application where users can pan
 
 ### Examples
 
-**Simple parcel view:**
+**Single parcel view:**
 ```javascript
-get_interactive_map_url({ apn: "0001-011-180" })
+get_interactive_map_url({ apns: ["0001-011-180"] })
 // → Opens map centered on parcel, highlighted
+```
+
+**Multiple parcels (site selection results):**
+```javascript
+get_interactive_map_url({
+  apns: ["0027030010", "0027040010", "0031010500"],
+  preset: "planning"
+})
+// → Opens map with all candidate parcels highlighted, zoomed to fit all
+// Great for presenting search results or site selection candidates!
 ```
 
 **Hazard assessment:**
 ```javascript
 get_interactive_map_url({
-  apn: "0001-011-180",
+  apns: ["0001-011-180"],
   preset: "hazards"
 })
 // → Opens hazard layers, centered on parcel
